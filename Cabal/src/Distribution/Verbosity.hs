@@ -54,7 +54,8 @@ module Distribution.Verbosity (
   verboseNoStderr,
 
   -- * No warnings
-  verboseNoWarn, isVerboseNoWarn
+  verboseNoWarn, isVerboseNoWarn,
+  verboseNoWarnExperimental, isVerboseNoWarnExperimental
   ) where
 
 import Prelude ()
@@ -217,6 +218,7 @@ parsecVerbosity = parseIntVerbosity <|> parseStringVerbosity
             "stderr"     -> return verboseStderr
             "stdout"     -> return verboseNoStderr
             "nowarn"     -> return verboseNoWarn
+            "nowarnexperimental" -> return verboseNoWarnExperimental
             _            -> P.unexpected $ "Bad verbosity flag: " ++ token
 
 flagToVerbosity :: ReadE Verbosity
@@ -244,6 +246,7 @@ showForCabal v
     showFlag VTimestamp  = ["+timestamp"]
     showFlag VStderr     = ["+stderr"]
     showFlag VNoWarn     = ["+nowarn"]
+    showFlag VNoWarnExperimental = ["+nowarnexperimental"]
 
 showForGHC :: Verbosity -> String
 showForGHC   v = maybe (error "unknown verbosity") show $
@@ -299,6 +302,10 @@ verboseNoStderr = verboseNoFlag VStderr
 verboseNoWarn :: Verbosity -> Verbosity
 verboseNoWarn = verboseFlag VNoWarn
 
+-- | Turn off warnings for experimental features for log messages
+verboseNoWarnExperimental :: Verbosity -> Verbosity
+verboseNoWarnExperimental = verboseFlag VNoWarnExperimental
+
 -- | Helper function for flag enabling functions
 verboseFlag :: VerbosityFlag -> (Verbosity -> Verbosity)
 verboseFlag flag v = v { vFlags = Set.insert flag (vFlags v) }
@@ -347,6 +354,10 @@ isVerboseStderr = isVerboseFlag VStderr
 -- | Test if we should output warnings when we log.
 isVerboseNoWarn :: Verbosity -> Bool
 isVerboseNoWarn = isVerboseFlag VNoWarn
+
+-- | Test if we should output warnings for experimental features when we log.
+isVerboseNoWarnExperimental :: Verbosity -> Bool
+isVerboseNoWarnExperimental = isVerboseFlag VNoWarnExperimental
 
 -- | Helper function for flag testing functions.
 isVerboseFlag :: VerbosityFlag -> Verbosity -> Bool

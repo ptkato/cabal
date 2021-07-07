@@ -22,6 +22,7 @@ data VerbosityFlag
     | VTimestamp
     | VStderr -- ^ @since 3.4.0.0
     | VNoWarn
+    | VNoWarnExperimental
     deriving (Generic, Show, Read, Eq, Ord, Enum, Bounded, Typeable)
 
 instance Binary VerbosityFlag

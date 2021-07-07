@@ -25,7 +25,7 @@ import           Distribution.Parsec.Error    (PError (..), showPError)
 import           Distribution.Parsec.Position (Position (..), zeroPos)
 import           Distribution.Parsec.Warning  (PWarnType (..), PWarning (..), showPWarning)
 import           Distribution.Simple.Utils    (die', warn)
-import           Distribution.Verbosity       (Verbosity)
+import           Distribution.Verbosity
 import           Distribution.Version         (Version)
 import           Prelude ()
 import           System.Directory             (doesFileExist)
@@ -188,7 +188,14 @@ parseString
     -> IO a
 parseString parser verbosity name bs = do
     let (warnings, result) = runParseResult (parser bs)
-    traverse_ (warn verbosity . showPWarning name) warnings
+
+    let noWarn = [wt | wt <- [minBound .. maxBound] -- :: [PWarnType]
+            , (wt == PWTExperimental) && isVerboseNoWarnExperimental verbosity
+            ]
+    traverse_ (\w@(PWarning warnType _ _) ->
+        unless (warnType `elem` noWarn) $
+            warn verbosity $ showPWarning name w) warnings
+
     case result of
         Right x -> return x
         Left (_, errors) -> do
