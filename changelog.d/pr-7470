@@ -1,0 +1,12 @@
+synopsis: Suppress warnings for verbosity
+packages: cabal-install
+prs: #7470
+issues: #7286
+
+description: {
+- adds a verbosity flag "+nowarn", to suppress all warnings
+- adds a verbosity flag "+nowarnexperimental", to suppress 
+  all warnings from experimental features
+- removes the warnings for extraneous versions
+  https://github.com/haskell/cabal/pull/7470#issuecomment-875878507
+}
